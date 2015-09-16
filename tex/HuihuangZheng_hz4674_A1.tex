@@ -1,0 +1,98 @@
+\documentclass[11pt,fleqn]{article}
+%\usepackage{CJK}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{graphicx, float}\usepackage{graphicx}
+%\usepackage[colorlinks]{hyperref}
+\setlength{\oddsidemargin}{-0.0in}
+\setlength{\evensidemargin}{-0.0in} \setlength{\textwidth}{6.0in}
+\setlength{\textheight}{9.0in} \setlength{\topmargin}{-0.2in}
+
+%\setlength{\leftmargin}{0.7in}
+\usepackage{amssymb, graphicx, amsmath}  %  fancyheadings,
+
+\newcommand\qed{\qquad $\square$}
+\newcommand{\nn}{\nonumber}
+
+\def \[{\begin{equation}}
+\def \]{\end{equation}}
+\def\proof{{\bf Proof:\quad}}
+\def \endzm {\quad $\Box$}
+\def\dist{\hbox{dist}}
+
+
+\newcommand{\R}{\mathbb{R}}
+%\newtheorem{yinli}{ТэАн}[section]
+\newcommand{\D}{\displaystyle}
+\newcommand{\T}{\textstyle}
+\newcommand{\SC}{\scriptstyle}
+\newcommand{\FT}{\footnotesize}
+
+
+
+%\newtheorem{theorem}{Theorem}[section]
+%\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{definition}{Definition}
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem{lemma}{Lemma}[section]
+\renewcommand{\thelemma}{\arabic{section}.\arabic{lemma}}
+\newtheorem{remark}{Remark}
+\renewcommand{\theremark}{\arabic{section}.\arabic{remark}}
+\newtheorem{proposition}{Proposition}[section]
+\renewcommand{\theproposition}{\arabic{section}.\arabic{proposition}}
+\newtheorem{corollary}{Corollary }[section]
+\renewcommand{\thecorollary}{\arabic{section}.\arabic{corollary}}
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\baselinestretch}{1.35}
+\newtheorem{exam}{Example}[section]
+\renewcommand{\theexam}{\arabic{section}.\arabic{exam}}
+\newtheorem{theo}{Theorem}[section]
+\renewcommand{\thetheo}{\arabic{section}.\arabic{theo}}
+\begin{document}
+%\begin{CJK*}{GBK}{song}
+
+\begin{center}
+
+{\LARGE \bf  Machine Learning and Computer Vision Assignment 1}\\
+
+
+\vskip 25pt
+ {Huihuang Zheng, huihuang@utexas.edu }\\
+\vskip 5pt
+{\small hz4674 Fall 2015 }
+
+
+\end{center}
+
+\section{Short Answer Problems}
+\begin{enumerate}
+  \item Suppose we have filter $f_1 \in \mathbb{R}^{1 \times n}$, $f_2 \in \mathbb{R}^{n \times 1}$. We have convolution $f_1 * f_2 \in \mathbb{R}^{n \times n}$. Suppose we have a picture $g$ of $k \times m$ pixels. Time complexity of performing $(f_1 * f_2) * g$ is $O(kmn^2)$. That's because $f_1 * f_2 \in \mathbb{R}^{n \times n}$. But the time complexity of performing $f_1 * (f_2 * g)$ is $O(kmn)$. That's because size of $(f_2 * g)$ is still $O(k \times m)$ and performing the $(f_2 * g)$ needs $O(kmn)$. Time complexity of perform $f_1 * (f_2 * g)$ is $O(kmn)$. \\
+      \textbf{A simple example:} $f_1 = [1,2,1], f_2 = [1,2,1]^T,g=
+      \begin{pmatrix}
+        2 & 2 & 2 & 2 & 2\\
+        3 & 3 & 3 & 3 & 3\\
+        4 & 4 & 4 & 4 & 4\\
+        5 & 5 & 5 & 5 & 5\\
+        6 & 6 & 6 & 6 & 6\\
+      \end{pmatrix}
+      $.
+      $f_1 * f_2 = 
+      \begin{pmatrix}
+        1 & 2 & 1\\
+        2 & 4 & 2 \\
+        1 & 2 & 1 \\
+      \end{pmatrix}
+      $.
+      And we let output size equals $g$'s size.
+      Performing $(f_1 * f_2) * g$ needs $9 * 25$ multiplications. 
+      Performing $h = f_2 * g$ needs $3 * 25$ multiplications and $f_1 * h$ needs $3 * 25$ multiplication. $f_1 * (f_2 * g)$ needs total $6 * 25$ multiplications.
+      
+  \item $[0,1,1,1,1,1,1,1]$
+  \item From filter $f'$, $[x_1,x_2,x_3,x_4,x_5]$'s first derivative is $(x_4 - x_2) / 2$. So second derivative is $(\frac{x_5 - x_3}{2} - \frac{x_3 - x_1}{2}) / 2$. So $f'' = [\frac{1}{4}, 0, -\frac{1}{2}, 0, \frac{1}{4}]$.
+  \item 1. Using higher threshold. 2. When smoothing with Gaussian. Using larger $\sigma$ value.
+  \item TODO
+  \item TODO
+\end{enumerate}
+
+%\end{CJK*}
+\end{document}
