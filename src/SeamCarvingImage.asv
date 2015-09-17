@@ -1,0 +1,153 @@
+classdef SeamCarvingImage
+    %This class reads a image and performs seam carving functions
+    
+    properties
+        ENERGY_FUNCTION_OPTION = 1;
+        
+        image;
+        grayImage;
+        doubleGrayImage;
+        xDerivative;
+        yDerivative;
+        energyMap;
+        
+    end
+    
+    methods
+        %constructor, just read image file
+        function obj = SeamCarvingImage(input_image)
+            obj.image = input_image;
+            obj = obj.init();
+        end
+        
+        function obj = init(obj)
+            obj.grayImage = obj.convertGray();
+            obj.doubleGrayImage = double(obj.grayImage);
+            obj.xDerivative = obj.xDerivativeFilter();
+            obj.yDerivative = obj.yDerivativeFilter();
+            obj.energyMap = obj.energyFunction(obj.ENERGY_FUNCTION_OPTION);
+        end
+        
+        %check whether obj.image is gray scale, and then convert.
+        function grayImage = convertGray(obj)
+            isize = size(obj.image); 
+            %if obj.image is RGB image, isize should be [*, *, 3].
+            %if obj.image is gray image, isize should be [*, *].
+     
+            if size(isize, 2) == 3 % 3 channels ==> RGB image
+                grayImage = rgb2gray(obj.image);
+            else % ==> gray image
+                grayImage = obj.image;
+            end
+        end
+        
+        %Perform horizontal filter [-1, 1]
+        function xDerivative = xDerivativeFilter(obj)
+            filter = [-1, 1];
+            xDerivative = imfilter(obj.doubleGrayImage, filter, 'same', 'circular'); 
+        end
+        
+        %Perform vertical filter [-1, 1]'
+        function yDerivative = yDerivativeFilter(obj)
+            filter = [-1, 1]';
+            yDerivative = imfilter(obj.doubleGrayImage, filter, 'same', 'circular'); 
+        end
+        
+        %Choose a energy function
+        function energyMap = energyFunction(obj, option)
+            if option == 1
+                energyMap = energyFunctionL1Norm(obj.xDerivative, obj.yDerivative);
+            elseif option == 2
+                energyMap = energyFunctionL2Norm(obj.xDerivative, obj.yDerivative);
+            else
+                %default L1 norm
+                energyMap = energyFunctionL1Norm(obj.xDerivative, obj.yDerivative);
+            end
+        end
+        %For test and debug
+        function showVerticalSeam(obj)
+            seam = verticalSeam(obj.energyMap);
+            row = size(obj.image, 1);
+            showImg = obj.image;
+            for r = 1:row
+                showImg(r, seam(r), 1) = 255;
+            end
+            imshow(showImg);
+        end
+        %For test and debug
+        function showHorizontalSeam(obj)
+            seam = horizontalSeam(obj.energyMap);
+            col = size(obj.image, 2);
+            showImg = obj.image;
+            for c = 1:col
+                showImg(seam(c), c, 1) = 255;
+            end
+            imshow(showImg);
+        end
+        
+        function output = removeVerticalSeam(image, seam)
+            isize = size(image);
+            if size(isize, 2) == 3 % RGB image
+                output = zerso(isize(1), isize(2) - 1, 3);
+                for i = 1:isize(1)
+                    output(i, 1:end, 1:3) = [image(i, 1:seams(c)-1, 1:3), image(i, seams(c)+1:end, 1:3),  ];
+                end
+            else % gray image
+                output = zeros(iszie(1), isize(2) - 1);
+                for i = 1:isize(1)
+                    output(i, 1:end,) = [image(i, 1:seams(c)-1, 1:3), image(i, seams(c)+1:end, 1:3),  ];
+                end
+            end
+        end
+        
+        function output = reduceWidth(obj, numPixels)
+            col = size(obj.image, 2);
+            row = size(obj.image, 1);
+            num = col - numPixels;
+            changedImage = SeamCarvingImage(obj.image);
+            
+            for i = 1:num
+                seam = verticalSeam(changedImage.energyMap);
+                %{
+                for r = 1:row
+                    for c = seam(r): col - 1
+                        changedImage.image(r, c:col-1, 1:3) = changedImage.image(r, c+1:col, 1:3);
+                    end
+                    r
+                end
+                %}
+                col = col - 1
+                %changedImage.image = changedImage.image(1:row, 1:col, 1:3);
+                changedImage = changedImage.init();
+                %{
+                for r = 1:row
+                    for c = seam(r):col
+                        for j = 1:3
+                            changedImage.image(r, c, j) = changedImage.image(r, c + 1, j); 
+                        end
+                        
+                        changedImage.grayImage(r, c) = changedImage.grayImage(r, c + 1);
+                        changedImage.doubleImage = double(changedImage.grayImage);
+                        if seam(r) - 1 > 0
+                        
+                        end
+                        xDerivative;
+                        yDerivative;
+                        energyMap;
+                    end
+                end
+                col = col - 1;
+                changedImage.image = changedImage.image(1:col);
+                changedImage.grayImage = changedImage.grayImage(1:col);
+                %}
+            end
+            output = changedImage.image;
+        end
+        
+        function output = reduceHeight(obj, numPixels)
+        
+        end
+    end
+    
+end
+

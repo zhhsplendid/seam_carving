@@ -1,0 +1,45 @@
+function seam = verticalSeam( energyMap )
+    %Dynamical programming
+    row = size(energyMap, 1);
+    col = size(energyMap, 2);
+    
+    cumulativeMinEnergy = zeros(row, col);
+    
+    %initial
+    for c = 1:col
+        cumulativeMinEnergy(1, i) = energyMap(1, i); 
+    end
+    
+    %cumulativeMinEnergy --- CME(r, c) = min( CME(r - 1, c), CME(r - 1, c - 1), CME(r - 1, c + 1) )
+    for r = 2:row
+        for c = 1:col
+            cumulativeMinEnergy(r, c) = cumulativeMinEnergy(r - 1, c);
+            if c - 1 > 0;
+                cumulativeMinEnergy(r, c) = min(cumulativeMinEnergy(r, c), cumulativeMinEnergy(r - 1, c - 1));
+            end
+            if c + 1 <= col
+                cumulativeMinEnergy(r, c) = min(cumulativeMinEnergy(r, c), cumulativeMinEnergy(r - 1, c + 1));
+            end
+        end
+    end
+    
+    minValue = cumulativeMinEnergy(row, 1);
+    minPos = 1;
+    for c = 2:col
+        if cumulvativeMinEnergy(row, c) < minValue;
+            minValue = cumulvativeMinEnergy(row, c);
+            minPos = c;
+        end
+    end
+    
+    seam = zeros(row, 1);
+    seam(row) = minPos;
+    for r = (row - 1):-1:1
+        minPos = seam(r+1);
+        minValue = cumulvativeMinEnergy(r, minPos);
+        if minPos - 1 > 0 and 
+            
+        end
+    end
+end
+
