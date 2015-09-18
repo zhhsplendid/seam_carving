@@ -76,7 +76,7 @@
         6 & 6 & 6 & 6 & 6\\
       \end{pmatrix}
       $.
-      $f_1 * f_2 = 
+      $f_1 * f_2 =
       \begin{pmatrix}
         1 & 2 & 1\\
         2 & 4 & 2 \\
@@ -84,13 +84,13 @@
       \end{pmatrix}
       $.
       And we let output size equals $g$'s size.
-      Performing $(f_1 * f_2) * g$ needs $9 * 25$ multiplications. 
+      Performing $(f_1 * f_2) * g$ needs $9 * 25$ multiplications.
       Performing $h = f_2 * g$ needs $3 * 25$ multiplications and $f_1 * h$ needs $3 * 25$ multiplication. $f_1 * (f_2 * g)$ needs total $6 * 25$ multiplications.
-      
+
   \item $[0,1,1,1,1,1,1,1]$
   \item From filter $f'$, $[x_1,x_2,x_3,x_4,x_5]$'s first derivative is $(x_4 - x_2) / 2$. So second derivative is $(\frac{x_5 - x_3}{2} - \frac{x_3 - x_1}{2}) / 2$. So $f'' = [\frac{1}{4}, 0, -\frac{1}{2}, 0, \frac{1}{4}]$.
   \item 1. Using higher threshold. 2. When smoothing with Gaussian. Using larger $\sigma$ value.
-  \item TODO
+  \item The Gaussian noise is hard to generate some contiguous pixels of noise. For example, some times we need 3 * 3 pixels noise with all values are same. It's hard to be generate by Gaussian noise. 
   \item TODO
 \end{enumerate}
 

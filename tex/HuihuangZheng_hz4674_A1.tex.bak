@@ -66,9 +66,30 @@
 
 \section{Short Answer Problems}
 \begin{enumerate}
-  \item Example, filter $f = [1, 2, 1]$, $g = [1, 2, 1]^T$. 
+  \item Suppose we have filter $f_1 \in \mathbb{R}^{1 \times n}$, $f_2 \in \mathbb{R}^{n \times 1}$. We have convolution $f_1 * f_2 \in \mathbb{R}^{n \times n}$. Suppose we have a picture $g$ of $k \times m$ pixels. Time complexity of performing $(f_1 * f_2) * g$ is $O(kmn^2)$. That's because $f_1 * f_2 \in \mathbb{R}^{n \times n}$. But the time complexity of performing $f_1 * (f_2 * g)$ is $O(kmn)$. That's because size of $(f_2 * g)$ is still $O(k \times m)$ and performing the $(f_2 * g)$ needs $O(kmn)$. Time complexity of perform $f_1 * (f_2 * g)$ is $O(kmn)$. \\
+      \textbf{A simple example:} $f_1 = [1,2,1], f_2 = [1,2,1]^T,g=
+      \begin{pmatrix}
+        2 & 2 & 2 & 2 & 2\\
+        3 & 3 & 3 & 3 & 3\\
+        4 & 4 & 4 & 4 & 4\\
+        5 & 5 & 5 & 5 & 5\\
+        6 & 6 & 6 & 6 & 6\\
+      \end{pmatrix}
+      $.
+      $f_1 * f_2 = 
+      \begin{pmatrix}
+        1 & 2 & 1\\
+        2 & 4 & 2 \\
+        1 & 2 & 1 \\
+      \end{pmatrix}
+      $.
+      And we let output size equals $g$'s size.
+      Performing $(f_1 * f_2) * g$ needs $9 * 25$ multiplications. 
+      Performing $h = f_2 * g$ needs $3 * 25$ multiplications and $f_1 * h$ needs $3 * 25$ multiplication. $f_1 * (f_2 * g)$ needs total $6 * 25$ multiplications.
+      
   \item $[0,1,1,1,1,1,1,1]$
-  \item $[\frac{1}{4}, 0, -\frac{1}{2}, 0, \frac{1}{4}]$.
+  \item From filter $f'$, $[x_1,x_2,x_3,x_4,x_5]$'s first derivative is $(x_4 - x_2) / 2$. So second derivative is $(\frac{x_5 - x_3}{2} - \frac{x_3 - x_1}{2}) / 2$. So $f'' = [\frac{1}{4}, 0, -\frac{1}{2}, 0, \frac{1}{4}]$.
+  \item 1. Using higher threshold. 2. When smoothing with Gaussian. Using larger $\sigma$ value.
   \item TODO
   \item TODO
 \end{enumerate}
