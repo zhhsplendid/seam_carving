@@ -4,6 +4,7 @@ classdef SeamCarvingImage
     properties
         ENERGY_FUNCTION_OPTION = 1;
         FRACTION_ENLARGE_SETP = 0.5;
+        INF = 2^27;
         
         image;
         grayImage;
@@ -12,6 +13,7 @@ classdef SeamCarvingImage
         yDerivative;
         energyMap;
         
+  
     end
     
     methods
@@ -27,6 +29,7 @@ classdef SeamCarvingImage
             obj.xDerivative = obj.xDerivativeFilter();
             obj.yDerivative = obj.yDerivativeFilter();
             obj.energyMap = obj.energyFunction(obj.ENERGY_FUNCTION_OPTION);
+            
         end
         
         %check whether obj.image is gray scale, and then convert.
@@ -60,6 +63,8 @@ classdef SeamCarvingImage
                 energyMap = energyFunctionL1Norm(obj.xDerivative, obj.yDerivative);
             elseif option == 2
                 energyMap = energyFunctionL2Norm(obj.xDerivative, obj.yDerivative);
+            elseif option == 3
+                energyMap = energyFunctionSecDeri(obj.xDerivative, obj.yDerivative);
             else
                 %default L1 norm
                 energyMap = energyFunctionL1Norm(obj.xDerivative, obj.yDerivative);
@@ -123,7 +128,7 @@ classdef SeamCarvingImage
         function output = reduceWidth(obj, numPixels)
             
             changedImage = SeamCarvingImage(obj.image);
-           
+            changedImage.ENERGY_FUNCTION_OPTION = obj.ENERGY_FUNCTION_OPTION;
             for i = 1:numPixels
                 seam = verticalSeam(changedImage.energyMap);
                 changedImage.image = changedImage.removeVerticalSeam(changedImage.image, seam);
@@ -135,7 +140,7 @@ classdef SeamCarvingImage
         
         function output = reduceHeight(obj, numPixels)
             changedImage = SeamCarvingImage(obj.image);
-           
+            changedImage.ENERGY_FUNCTION_OPTION = obj.ENERGY_FUNCTION_OPTION;
             for i = 1:numPixels
                 seam = horizontalSeam(changedImage.energyMap);
                 changedImage.image = changedImage.removeHorizontalSeam(changedImage.image, seam);
@@ -177,7 +182,7 @@ classdef SeamCarvingImage
             %First choose numPixels seams for removal
             %Second dupicate piexls of those seams by avarage of top/bottom
             kseams = obj.chooseKHorizontalSeams(image, numPixels);
-            ['chose k seams']
+
             row = size(image, 1);
             col = size(image, 2);
             
@@ -238,7 +243,7 @@ classdef SeamCarvingImage
             output = uint8(output);
         end
         
-        function kseams = chooseKHorizontalSeams(obj, image, k)
+        function [kseams, changedImage] = chooseKHorizontalSeams(obj, image, k)
             row = size(image, 1);
             col = size(image, 2);
             kseams = zeros(row, col); %mark 1 if the piexl is chosen as piexl in k seams.
@@ -267,7 +272,6 @@ classdef SeamCarvingImage
             %Second dupicate piexls of those seams by avarage of left/right
             kseams = obj.chooseKVerticalSeams(image, numPixels);
             
-            ['chose k seams']
             row = size(image, 1);
             col = size(image, 2);
             
@@ -300,8 +304,7 @@ classdef SeamCarvingImage
                 end
             else %gray image
                 output = zeros(row, col + numPixels);
-                row
-                col + numPixels
+                
                 for r = 1:row
                     cpos = 1;
                     for c = 1:col
@@ -329,13 +332,13 @@ classdef SeamCarvingImage
             output = uint8(output);
         end
         
-        function kseams = chooseKVerticalSeams(obj, image, k)
+        function [kseams, changedImage] = chooseKVerticalSeams(obj, image, k)
             row = size(image, 1);
             col = size(image, 2);
             kseams = zeros(row, col); %mark 1 if the piexl is chosen as piexl in k seams.
             
             changedImage = SeamCarvingImage(image);
-           
+            
             for i = 1:k
                 seam = verticalSeam(changedImage.energyMap);
                 for r = 1:row
@@ -353,6 +356,71 @@ classdef SeamCarvingImage
             end
         end
         
+        function output = removeObject(obj)
+            
+            imshow(obj.image);
+            handle = impoly;
+            polygon = wait(handle);
+            
+            objectWidth = max(polygon(1:end, 1)) - min(polygon(1:end, 1)) + 1;
+            objectHeight = max(polygon(1:end, 2)) - min(polygon(1:end, 2)) + 1;
+            
+            esize = size(obj.energyMap);
+            removeMask = zeros(esize);
+            for r = 1:esize(1)
+                for c = 1:esize(2)
+                    if inpolygon(c, r, polygon(1:end, 1), polygon(1:end, 2));
+                        removeMask(r, c) = 1;
+                    end
+                end
+            end
+            
+            if objectWidth <= objectHeight
+                output = obj.removeObjectByReducingWidth(removeMask);
+            else
+                output = obj.removeObjectByReducingHeight(removeMask);
+            end
+        end
+        
+        function output = removeObjectByReducingHeight(obj, removeMask)
+            changedImage = SeamCarvingImage(obj.image);
+           
+            while sum(sum(removeMask)) ~= 0
+                changedImage.energyMap = changedImage.energyMap - obj.INF * removeMask;
+                seam = horizontalSeam(changedImage.energyMap);
+                changedImage.image = changedImage.removeHorizontalSeam(changedImage.image, seam);
+                changedImage = changedImage.init();
+                
+                rsize = size(removeMask);
+            
+                for i = 1:rsize(2)
+                    removeMask(1:seam(i)-1, i) = removeMask(1:seam(i)-1, i);
+                    removeMask(seam(i):end-1, i) = removeMask(seam(i)+1:end, i);
+                end
+                removeMask = removeMask(1:end - 1, 1:end);
+            end
+            output = changedImage.image;
+        end
+        
+        function output = removeObjectByReducingWidth(obj, removeMask)
+            changedImage = SeamCarvingImage(obj.image);
+           
+            while sum(sum(removeMask)) ~= 0
+                changedImage.energyMap = changedImage.energyMap - obj.INF * removeMask;
+                seam = verticalSeam(changedImage.energyMap);
+                changedImage.image = changedImage.removeVerticalSeam(changedImage.image, seam);
+                changedImage = changedImage.init();
+                
+                rsize = size(removeMask);
+            
+                for i = 1:rsize(1)
+                    removeMask(i, 1:seam(i)-1) = removeMask(i, 1:seam(i)-1);
+                    removeMask(i, seam(i):end-1) = removeMask(i, seam(i)+1:end);
+                end
+                removeMask = removeMask(1:end, 1:end-1);
+            end
+            output = changedImage.image;
+        end
     end
     
 end

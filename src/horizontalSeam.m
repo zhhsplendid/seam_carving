@@ -1,4 +1,4 @@
-function seam = horizontalSeam( energyMap )
+function [seam, cumulativeMinEnergy] = horizontalSeam( energyMap )
     %Dynamical programming
     row = size(energyMap, 1);
     col = size(energyMap, 2);

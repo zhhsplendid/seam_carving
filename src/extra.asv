@@ -1,0 +1,14 @@
+%Script for debug
+function extra()
+    
+    img = imread('../input_images/im2.jpg');
+    c = SeamCarvingImage(img);
+    
+    iimg = c.increaseWidth(img, 100);
+    imwrite(iimg, '../output_images/increasePixels/im2_iw');
+    
+    rimg = c.removeObject();
+    imshow(rimg);
+    imwrite(rimg, '');
+    
+end
